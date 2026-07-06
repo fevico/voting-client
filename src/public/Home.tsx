@@ -22,8 +22,8 @@ const Home = () => {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-center">Live Election Results</h2>
           <p className="text-center text-zinc-500">See who is winning in real-time.</p>
-          {/* Your results charts or lists will go here! */}
-        </div>
+          {/* Your results charts or lists will go here! */}   
+        </div>   
       )}
     </div>
   );
