@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch } from "@/store/hook"; // Ensure this matches your filename "hook.ts" or "hooks.ts"
 import { apiSlice } from "@/service/api";
@@ -15,7 +15,7 @@ export const useRealtimeVotes = (electionId?: string) => {
       transports: ["websocket"],
     });
 
-    socket.on("connect", () => {
+    socket.on("connect", () => { 
       console.log(`⚡ Connected to socket. ID: ${socket.id}`);
       if (electionId) {
         socket.emit("joinElection", electionId);
@@ -69,4 +69,56 @@ export const useRealtimeVotes = (electionId?: string) => {
       socket.disconnect();
     };
   }, [electionId, dispatch]);
+};
+
+interface IncomingMessage {
+  text: string;
+  sender: string;
+  timestamp: string;
+}
+
+// src/hook/useChatRealtime.ts
+export const useChatRealtime = (roomName: string, onMessageReceived: (msg: IncomingMessage) => void) => {
+  const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    if (!roomName) return;
+
+    const socket: Socket = io(SOCKET_BACKEND_URL, {
+      transports: ["websocket"],
+    });
+    
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      console.log(`💬 Chat socket connected: ${socket.id}`);
+      socket.emit("joinElection", roomName); 
+    });
+
+    socket.on("receiveMessage", (message: IncomingMessage) => {
+      onMessageReceived(message); 
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("receiveMessage");
+      socket.disconnect();
+    };
+  }, [roomName, onMessageReceived]);
+
+  // 👑 FIXED: Return a reliable trigger function instead of a raw null/socket object
+  const emitMessage = useCallback((text: string, sender: string) => {
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit("sendMessage", {
+        room: roomName,
+        text: text,
+        sender: sender
+      });
+      console.log("✈️ Successfully emitted to tunnel:", text);
+    } else {
+      console.warn("⚠️ Cannot send: Socket is not fully connected yet.");
+    }
+  }, [roomName]);
+
+  return { emitMessage };
 };

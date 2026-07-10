@@ -1,3 +1,5 @@
+import type { FC } from "react";
+import Divider, { type Lead } from "./Divider";
 import { Card } from "./ui/card";
 import { Mail, MessageSquare, QrCode, Vote } from "lucide-react";
 
@@ -8,7 +10,11 @@ export const voteMethods = [
   {id: "sms", name: "SMS Verify", title: "Verify with a text message", icon: MessageSquare, bg: "bg-emerald-50/60 border-emerald-100 text-emerald-700" }
 ];
 
-const VotingMethod = () => {
+interface Props {
+    leadPoint: Lead
+}
+
+const VotingMethod: FC<Props> = ({leadPoint}) => {
   return (
     <div className="w-full bg-gradient-to-b from-purple-50/60 to-pink-50/30 pt-16 pb-12 flex flex-col items-center justify-center">
       {/* 1. Header Text Container */}
@@ -46,6 +52,7 @@ const VotingMethod = () => {
           ))}
         </div>
       </div>
+      <Divider leadingPoint={leadPoint}/>
     </div>
   );
 };

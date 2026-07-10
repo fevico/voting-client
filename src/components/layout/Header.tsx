@@ -1,5 +1,7 @@
 import { Trophy, CheckSquare, BarChart3, TrendingUp } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGetContestantQuery } from "@/service/api";
+import { useRealtimeVotes } from "@/hook/useRealtimeVote";
 
 interface HeaderProps {
   activeTab: string;
@@ -7,6 +9,14 @@ interface HeaderProps {
 }
 
 const Header = ({ activeTab, onTabChange }: HeaderProps) => {
+    const { data: contestant } = useGetContestantQuery();
+      // Find the contestant with the maximum votes using reduce
+      const activeElectionId = contestant?.contestants?.[0]?.election?._id;
+      useRealtimeVotes(activeElectionId);  
+
+      const totalVotesPool = contestant?.totalVotes;
+      const totalVote = totalVotesPool ? totalVotesPool : 0;
+  
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-zinc-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -49,8 +59,11 @@ const Header = ({ activeTab, onTabChange }: HeaderProps) => {
 
           {/* Total Votes Badge */}
           <div className="hidden sm:flex items-center gap-1.5 bg-zinc-50 px-3 py-2 rounded-xl border border-zinc-100 h-11">
+            <span>
+              <a href="/chat">Chat</a>
+            </span>
             <TrendingUp className="h-4 w-4 text-emerald-600" />
-            <span className="text-sm font-semibold text-zinc-700">17,305</span>
+            <span className="text-sm font-semibold text-zinc-700">{totalVote}</span>
             <span className="text-xs text-zinc-400 font-medium">Total Votes</span>
           </div>
         </div>
