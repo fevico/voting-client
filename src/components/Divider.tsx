@@ -10,7 +10,6 @@ interface Props{
 }
 
 const Divider: FC<Props> = ({ leadingPoint }) => {
-  console.log(leadingPoint);
   return (
     <div className="w-full bg-[#F9EBC8] mt-6">
       <div className="flex gap-4 justify-center py-6">
